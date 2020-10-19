@@ -1,26 +1,53 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import FilmRow from "./Component/FilmRow";
+import useQuery from "./Hooks/useQuery";
 
-function App() {
+import { StyleWrapper, StyleLoading } from "./style";
+
+const App = () => {
+  const { request, data, loading } = useQuery();
+
+  const [allCount, setAllCount] = useState(0);
+
+  useEffect(() => {
+    request("http://swapi.dev/api/films/");
+  }, []);
+
+  const handleAllCount = () => {
+    setAllCount((allCount) => allCount + 1);
+  };
+
+  if (loading) {
+    return <StyleLoading>Loading ...</StyleLoading>;
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
+    <StyleWrapper>
+      <div className="App">
+        <h1 className="title">List of Star Wars Movies</h1>
+        <table className="table">
+          <thead>
+            <th>Title</th>
+            <th>Release Date</th>
+            <th>Vote</th>
+          </thead>
+          <tbody>
+            {(data.results.sort() || []).map((item) => (
+              <FilmRow
+                key={item.episode_id}
+                details={item}
+                handleAllCount={handleAllCount}
+              />
+            ))}
+          </tbody>
+        </table>
+        <p className="allCountWrapper">
+          All Count: <span className="allCount">{allCount}</span>
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      </div>
+    </StyleWrapper>
   );
-}
+};
 
 export default App;
